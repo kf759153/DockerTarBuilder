@@ -17,9 +17,8 @@ jobs:
 
       - name: Render kruise-rollout chart to YAML
         run: |
-          helm repo add openkruise-rollout https://openkruise.github.io/rollouts-charts/
           helm repo update
-          helm template kruise-rollout openkruise-rollout/rollouts --version 0.6.2 > 02-kruise-rollout.yaml
+          helm template kruise-rollout openkruise/kruise-rollout --version 0.6.2 > 02-kruise-rollout.yaml
 
       - name: Show image list
         run: |
