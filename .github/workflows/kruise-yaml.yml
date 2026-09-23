@@ -1,16 +1,32 @@
 name: Export OpenKruise YAML
 on:
   workflow_dispatch:
+
 jobs:
   export:
     runs-on: ubuntu-latest
     steps:
       - name: Install helm
         run: curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
       - name: Render kruise chart to YAML
         run: |
-          helm template kruise https://github.com/openkruise/kruise/releases/download/v1.8.3/kruise-chart.tgz > 01-kruise.yaml
-          helm template kruise-rollout https://github.com/openkruise/rollouts/releases/download/v0.6.2/kruise-rollout-chart.tgz >02-kruise-rollout.yaml
+          helm repo add openkruise https://openkruise.github.io/charts/
+          helm repo update
+          helm template kruise openkruise/kruise --version 1.8.3 > 01-kruise.yaml
+
+      - name: Render kruise-rollout chart to YAML
+        run: |
+          helm repo add openkruise-rollout https://openkruise.github.io/rollouts-charts/
+          helm repo update
+          helm template kruise-rollout openkruise-rollout/rollouts --version 0.6.2 > 02-kruise-rollout.yaml
+
+      - name: Show image list
+        run: |
+          grep -E "image:" 01-kruise.yaml | sort -u
+          echo "----"
+          grep -E "image:" 02-kruise-rollout.yaml | sort -u
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
